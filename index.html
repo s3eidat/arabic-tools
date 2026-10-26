@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; media-src 'self' data: blob:; connect-src 'self' data: blob:; worker-src 'self' blob:; manifest-src 'self'; form-action 'none'; base-uri 'none'; object-src 'none'">
+<meta name="referrer" content="no-referrer">
+<title>Arabic Tools — Remove Tashkeel, Convert Digits, Arabizi to Arabic | S3eidat Tools</title>
+<meta name="description" content="Free Arabic text toolkit: remove tashkeel (harakat) and tatweel, normalize alef, ya and ta marbuta, convert Arabic-Indic and Western digits, and turn Arabizi (3=ع, 7=ح) into Arabic letters. Private, runs in your browser.">
+<meta property="og:title" content="Arabic Tools — أدوات النص العربي">
+<meta property="og:description" content="Remove tashkeel, fix digits, Arabizi to Arabic. Runs 100% in your browser.">
+<meta property="og:image" content="screenshot.png">
+<link rel="icon" href="kit/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="kit/kit.css">
+<link rel="stylesheet" href="app.css">
+<script src="kit/kit.js"></script>
+</head>
+<body data-tool="arabic-tools">
+<main class="s3-main">
+  <section class="s3-hero">
+    <h1>Arabic Tools <span class="ar-h" lang="ar" dir="rtl">أدوات النص العربي</span></h1>
+    <p>Remove tashkeel and tatweel, normalize letters for search, switch between ٠١٢ and 012 digits, or turn Arabizi like <span class="mono">mar7aba</span> into مرحبا. Everything happens on your device.</p>
+  </section>
+
+  <section class="card">
+    <div class="row between">
+      <div class="seg" id="mode" role="group" aria-label="Mode">
+        <button aria-pressed="true" data-v="clean">Clean &amp; normalize <span lang="ar">· تنظيف</span></button>
+        <button aria-pressed="false" data-v="arabizi">Arabizi → Arabic <span lang="ar">· عربيزي</span></button>
+      </div>
+      <button class="btn ghost small" id="reset">Reset options</button>
+    </div>
+
+    <div id="cleanOpts" class="at-opts mt">
+      <label class="check"><input type="checkbox" data-o="tashkeel" checked> <span>Remove tashkeel <bdi lang="ar">إزالة التشكيل</bdi></span></label>
+      <label class="check"><input type="checkbox" data-o="keepShadda"> <span>…but keep shadda <bdi lang="ar">إبقاء الشدة</bdi></span></label>
+      <label class="check"><input type="checkbox" data-o="tatweel" checked> <span>Remove tatweel <bdi lang="ar">إزالة التطويل</bdi></span></label>
+      <label class="check"><input type="checkbox" data-o="alef"> <span><bdi>أ إ آ ٱ</bdi> → <bdi>ا</bdi> <bdi lang="ar">توحيد الألف</bdi></span></label>
+      <label class="check"><input type="checkbox" data-o="ya"> <span><bdi>ى</bdi> → <bdi>ي</bdi> <bdi lang="ar">توحيد الياء</bdi></span></label>
+      <label class="check"><input type="checkbox" data-o="ta"> <span><bdi>ة</bdi> → <bdi>ه</bdi> <bdi lang="ar">التاء المربوطة</bdi></span></label>
+      <label class="check"><input type="checkbox" data-o="hamza"> <span><bdi>ؤ</bdi> → <bdi>و</bdi>, <bdi>ئ</bdi> → <bdi>ي</bdi> <bdi lang="ar">الهمزة على حرف</bdi></span></label>
+      <label class="check"><input type="checkbox" data-o="punct"> <span><bdi>, ; ?</bdi> → <bdi>، ؛ ؟</bdi> <bdi lang="ar">علامات الترقيم</bdi></span></label>
+      <div class="row at-digits">
+        <span class="faint">Digits <bdi lang="ar">الأرقام</bdi></span>
+        <div class="seg" id="digits" role="group" aria-label="Digits">
+          <button aria-pressed="true" data-v="keep">Keep</button>
+          <button aria-pressed="false" data-v="western">→ 0123</button>
+          <button aria-pressed="false" data-v="arabic">→ <bdi>٠١٢٣</bdi></button>
+        </div>
+      </div>
+    </div>
+
+    <div id="arabiziOpts" class="mt" hidden>
+      <p class="faint at-note">Arabizi has no single standard, so this is a best guess: short vowels are dropped, long ones become ا و ي, doubled letters become one, and <span class="mono">el / al</span> join the next word. Check the result and edit what you need.</p>
+      <div class="at-map" id="map" dir="ltr"></div>
+    </div>
+  </section>
+
+  <div class="grid-2 at-grid mt">
+    <section class="card">
+      <div class="row between">
+        <h2>Input <small lang="ar">النص</small></h2>
+        <div class="row">
+          <button class="btn ghost small" id="sample">Sample</button>
+          <button class="btn ghost small" id="clear"><svg class="i"><use href="#i-trash"/></svg>Clear</button>
+        </div>
+      </div>
+      <label for="input" class="faint" id="inputHint">Paste Arabic text</label>
+      <textarea class="textarea prose at-box mt" id="input" dir="auto" spellcheck="false"></textarea>
+    </section>
+
+    <section class="card">
+      <div class="row between">
+        <h2>Result <small lang="ar">النتيجة</small></h2>
+        <div class="row">
+          <button class="btn small" id="use">Use as input</button>
+          <button class="btn small" id="save"><svg class="i"><use href="#i-download"/></svg>.txt</button>
+          <button class="btn small primary" id="copy"><svg class="i"><use href="#i-copy"/></svg>Copy</button>
+        </div>
+      </div>
+      <div class="out at-box at-out mt" id="out" tabindex="0" dir="rtl" lang="ar" aria-live="polite"></div>
+      <div class="stats mt" id="stats"></div>
+    </section>
+  </div>
+</main>
+<script src="app.js"></script>
+</body>
+</html>
